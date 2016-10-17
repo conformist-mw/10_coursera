@@ -14,7 +14,7 @@ def get_courses_list():
     root = etree.fromstring(xml.content)
     links = [link.text for link in root.iter('{*}loc') if 'learn' in link.text]
     random.shuffle(links)
-    return links[:30]
+    return links[:20]
 
 
 def get_content(url):
