@@ -15,7 +15,7 @@ def get_courses_list():
     root = etree.fromstring(xml.content)
     links = [link.text for link in root.iter('{*}loc') if 'learn' in link.text]
     random.shuffle(links)
-    return links[:20]
+    return links[:1]
 
 
 def get_course_info(url):
@@ -35,26 +35,24 @@ def get_course_info(url):
             0]['startDate']
     data['weeks'] = len(soup.findAll('div', {'class': 'week'}))
     datalist = [data['title'], data['Language'], data[
-        'weeks'], data['start'], data['User']]
+        'weeks'], data['start'], data['User'], url]
     return datalist
 
 
-def output_courses_info_to_xlsx(filepath, lists):
+def output_courses_info_to_xlsx(filepath, courses_info):
     wb = Workbook()
     ws = wb.active
     ws.title = 'coursera'
-    for num, lst in enumerate(lists, 1):
-        for i, val in enumerate(lst, 1):
-            ws.cell(row=num, column=i).value = val
+    for num, course in enumerate(courses_info, 1):
+        for i, val in enumerate(course, 1):
+            if i == 6:
+                ws.cell(row=num, column=i).value = 'more details →'
+                ws.cell(row=num, column=i).hyperlink = val
+            else:
+                ws.cell(row=num, column=i).value = val
     wb.save(filename=filepath)
 
 
 links = get_courses_list()
-print(links)
-lists = []
-for link in links:
-    print(link)
-    tmp = get_course_info(link)
-    print(tmp)
-    lists.append(tmp)
-print(lists)
+lists = [get_course_info(link) for link in links]
+output_courses_info_to_xlsx('test.xlsx', lists)
